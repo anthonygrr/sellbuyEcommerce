@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db_mysql:
+    container_name: sellbuydb
+    image: mysql:latest
+    ports:
+      - "3306:3306"  # Mapea el puerto 3306 del contenedor al 3306 del host
+    volumes:
+      - ./mysql-db:/var/lib/mysql 
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+       # Opcional: crea una base de datos al iniciar
+      - MYSQL_DATABASE=sellbuy_php_db
