@@ -21,9 +21,6 @@
 - User authentication with email and password.
 - Sign Up & Sign In.
 - Database implementation with Docker.
-- API documentation with Springdoc.
-- JSON serialization/deserialization with Jackson.
-- Simplified code with Lombok.
 
 
 ## Built With
