@@ -15,8 +15,7 @@
 ## About the Project
 <img src="docs/homePage.png" alt="SPRING BOOT REST API + DOCKER" >
 
-<b>Sellbuy</b> is a Spring boot REST API with Docker designed to manage discussion forums through CRUD operations, with support for 
-authentication and authorizationThe application is developed with Spring Boot.
+<b>Sellbuy</b> is an e-commerce platform, developed in PHP, offers the online sale of unisex clothing and accessories. It provides a user-friendly interface, secure purchasing, and efficient product management to deliver a seamless shopping experience.
 
 ### Main Features:
 - User authentication with email and password.
