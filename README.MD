@@ -25,7 +25,7 @@
 
 ## Built With
 
-- **PHP**: Framework for robust Java application development.
+- **PHP**: Language for robust backend application development.
 - **HTML, CSS and JavaScript**: Handles UI/UX and functionality on the Web Client.
 - **MySQL**: Relational database.
 - **Docker**: Container Management.
