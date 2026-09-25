@@ -1,5 +1,5 @@
 <?php
-include('../_conection.php');
+include __DIR__ . '/../_conection.php';
 $response=new stdClass();
 
 

@@ -1,7 +1,7 @@
 <?php 
     session_start();
     $response=new stdClass();
-        include_once('../_conection.php');
+        include_once __DIR__ . '/../_conection.php';
         $code_user=$_SESSION['code_user'];
         $address_order=$_POST['address_user'];
         $phone_order=$_POST['phone_user'];
