@@ -86,7 +86,11 @@ Free Return
         </form>
 
         <form class="form">
-          <input type="text" placeholder="1" />
+          <div class="qty-stepper">
+            <button type="button" class="qty-btn qty-dec" aria-label="Decrease quantity">&minus;</button>
+            <input type="text" id="qtyInput" class="qty-value" value="1" inputmode="numeric" aria-label="Quantity" readonly />
+            <button type="button" class="qty-btn qty-inc" aria-label="Increase quantity">+</button>
+          </div>
           <a href="#" class="addCart" onclick="iniciate_buy()">Add To Cart</a>
         </form>
         <h3>Product Detail</h3>
@@ -243,7 +247,8 @@ let charge=1;
             url:'/backend/auth/verify_login-buy.php',
             type:'POST',
             data:{
-              code_prod:p
+              code_prod:p,
+              quantity:get_valid_qty()
             },
             success:function(data){
                 console.log(data);
@@ -270,6 +275,155 @@ let charge=1;
           window.location.href="/pages/auth/signin.php";
     }
     </script> 
+
+  <script type="text/javascript">
+    /* Quantity stepper: +/- controls clamped to integers 1..99. */
+    function get_valid_qty() {
+      var input = document.getElementById("qtyInput");
+      if (!input) return 1;
+      var n = parseInt(input.value, 10);
+      if (isNaN(n) || n < 1) n = 1;
+      if (n > 99) n = 99;
+      input.value = n;
+      return n;
+    }
+
+    function step_qty(delta) {
+      var n = get_valid_qty() + delta;
+      if (n < 1) n = 1;
+      if (n > 99) n = 99;
+      var input = document.getElementById("qtyInput");
+      if (input) input.value = n;
+    }
+
+    (function () {
+      var dec = document.querySelector(".qty-dec");
+      var inc = document.querySelector(".qty-inc");
+      var input = document.getElementById("qtyInput");
+      if (!dec || !inc || !input) return;
+      dec.addEventListener("click", function () { step_qty(-1); });
+      inc.addEventListener("click", function () { step_qty(1); });
+      input.addEventListener("change", get_valid_qty);
+      input.addEventListener("blur", get_valid_qty);
+    })();
+
+    /* Hover-lens zoom (Amazon-style) on the main product image. */
+    (function () {
+      var ZOOM = 2;    /* preview scale factor */
+      var LENS = 120;  /* lens size in px */
+      var PANEL = 300; /* preview panel size in px */
+      var GAP = 16;    /* gap between the image and the panel */
+
+      var main = document.querySelector(".product-detail .left .main");
+      var img = document.getElementById("productimage");
+      if (!main || !img) return;
+
+      var lens = document.createElement("div");
+      lens.className = "zoom-lens";
+      lens.setAttribute("aria-hidden", "true");
+      var panel = document.createElement("div");
+      panel.className = "zoom-preview";
+      panel.setAttribute("aria-hidden", "true");
+      main.appendChild(lens);
+      main.appendChild(panel);
+
+      var activeSrc = "";
+
+      /* The img frame uses object-fit: contain, so the visible picture can be
+         letterboxed inside it. Returns that rect relative to .main (the
+         absolute-positioning parent of lens/panel), or null if not measurable. */
+      function image_rect() {
+        var frameW = img.clientWidth, frameH = img.clientHeight;
+        var natW = img.naturalWidth, natH = img.naturalHeight;
+        if (!frameW || !frameH || !natW || !natH) return null;
+        var scale = Math.min(frameW / natW, frameH / natH);
+        var w = natW * scale, h = natH * scale;
+        var imgBox = img.getBoundingClientRect();
+        var mainBox = main.getBoundingClientRect();
+        return {
+          w: w,
+          h: h,
+          x: imgBox.left - mainBox.left + (frameW - w) / 2,
+          y: imgBox.top - mainBox.top + (frameH - h) / 2
+        };
+      }
+
+      function ready() {
+        return !!img.getAttribute("src") && img.naturalWidth > 0;
+      }
+
+      function hide() {
+        lens.style.display = "none";
+        panel.style.display = "none";
+        activeSrc = "";
+      }
+
+      function show(e) {
+        if (!ready()) { hide(); return; }
+        var rect = image_rect();
+        if (!rect) { hide(); return; }
+        activeSrc = img.src;
+        panel.style.backgroundImage = 'url("' + img.src + '")';
+        panel.style.backgroundSize = (rect.w * ZOOM) + "px " + (rect.h * ZOOM) + "px";
+        lens.style.display = "block";
+        panel.style.display = "block";
+        update(e);
+      }
+
+      function update(e) {
+        if (!activeSrc || img.src !== activeSrc || !ready()) { hide(); return; }
+        var rect = image_rect();
+        if (!rect) { hide(); return; }
+        var mainBox = main.getBoundingClientRect();
+
+        /* Cursor relative to .main (the origin used by absolutely positioned children). */
+        var cx = e.clientX - mainBox.left;
+        var cy = e.clientY - mainBox.top;
+        /* Cursor relative to the visible picture. */
+        var ix = cx - rect.x;
+        var iy = cy - rect.y;
+
+        /* Lens follows the cursor, clamped inside the image bounds. */
+        var lx = Math.min(Math.max(ix - LENS / 2, 0), Math.max(rect.w - LENS, 0));
+        var ly = Math.min(Math.max(iy - LENS / 2, 0), Math.max(rect.h - LENS, 0));
+        lens.style.left = (rect.x + lx) + "px";
+        lens.style.top = (rect.y + ly) + "px";
+
+        /* Cursor percentage over the image drives the preview background-position. */
+        var px = Math.min(Math.max(ix, 0), rect.w);
+        var py = Math.min(Math.max(iy, 0), rect.h);
+        panel.style.backgroundPosition =
+          (px / rect.w) * 100 + "% " + (py / rect.h) * 100 + "%";
+
+        /* Preview sits beside the image (right side, left fallback on overflow). */
+        var left = rect.x + rect.w + GAP;
+        if (mainBox.left + left + PANEL > window.innerWidth) left = rect.x - GAP - PANEL;
+        if (mainBox.left + left < 0) left = 0;
+        var top = Math.min(Math.max(cy - PANEL / 2, 0), Math.max(main.clientHeight - PANEL, 0));
+        panel.style.left = left + "px";
+        panel.style.top = top + "px";
+      }
+
+      function on_move(e) {
+        if (!ready()) { hide(); return; }
+        if (img.src !== activeSrc) { show(e); return; }
+        update(e);
+      }
+
+      /* Listeners live on .main because the img src is filled asynchronously. */
+      main.addEventListener("mouseenter", show);
+      main.addEventListener("mousemove", on_move);
+      main.addEventListener("mouseleave", hide);
+
+      /* Hide/cleanup also when the src changes after the zoom is active. */
+      if (window.MutationObserver) {
+        new MutationObserver(hide).observe(img, {
+          attributes: true,
+          attributeFilter: ["src"]
+        });
+      }
+    })();
+  </script>
 
 </body>
 

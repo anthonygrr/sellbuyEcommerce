@@ -2081,4 +2081,110 @@ body.dark .pagination span.icon:hover {
   color: var(--grey2);
 }
 
+/* ============================================================
+   PRODUCT DETAILS — QUANTITY STEPPER + HOVER-LENS ZOOM
+   Appended at the END of the file on purpose: the stepper must
+   win over `.product-detail .form input` (~line 1339) and the
+   lens/preview need `body.dark` variants declared after the
+   existing mid-file `body.dark` rules (~line 36+).
+   ============================================================ */
+
+/* Quantity stepper (T2) — no pre-existing .qty-* selectors collide */
+.product-detail .form .qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-right: 2rem;
+  border: 1px solid var(--grey1);
+  border-radius: 3rem;
+  background-color: var(--white);
+}
+
+.product-detail .form .qty-stepper .qty-btn {
+  width: 3.2rem;
+  height: 3.2rem;
+  border: none;
+  background: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--black);
+  cursor: pointer;
+  transition: color 200ms ease, transform 120ms ease;
+}
+
+.product-detail .form .qty-stepper .qty-btn:hover {
+  color: var(--primary);
+}
+
+.product-detail .form .qty-stepper .qty-btn:active {
+  transform: scale(0.9);
+}
+
+/* Overrides `.product-detail .form input` (padding/width/margin) for the
+   stepper value only — that rule is (0,2,1), this one is (0,4,0). */
+.product-detail .form .qty-stepper .qty-value {
+  width: 3rem;
+  padding: 0.6rem 0;
+  margin-right: 0;
+  border: none;
+  background: none;
+  font-size: 1.6rem;
+  text-align: center;
+  color: var(--black);
+  outline: none;
+  cursor: default;
+}
+
+/* Quantity stepper — dark mode */
+body.dark .product-detail .form .qty-stepper {
+  background-color: var(--black2);
+  border-color: #444;
+}
+
+body.dark .product-detail .form .qty-stepper .qty-btn,
+body.dark .product-detail .form .qty-stepper .qty-value {
+  color: var(--white);
+}
+
+/* Hover-lens zoom (T3) — new stacking anchor for the lens/preview.
+   Declares only `position`, so the existing `.product-detail .left .main`
+   rule (~line 1292: background/height/padding/text-align) is untouched. */
+.product-detail .left .main {
+  position: relative;
+}
+
+.zoom-lens {
+  position: absolute;
+  display: none;
+  border: 2px solid rgba(255, 69, 69, 0.65);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.zoom-preview {
+  position: absolute;
+  display: none;
+  border: 1px solid var(--grey1);
+  border-radius: 0.4rem;
+  background-color: var(--white);
+  background-repeat: no-repeat;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* Hover-lens zoom — dark mode */
+body.dark .zoom-lens {
+  border-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .zoom-preview {
+  background-color: var(--black2);
+  border-color: #555;
+}
+
 

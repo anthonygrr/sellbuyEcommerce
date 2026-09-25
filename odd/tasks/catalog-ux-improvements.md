@@ -148,5 +148,12 @@ replacing native `alert()` calls.
       11947 lines — candidate includes the in-progress refactor). Consent relayed →
       user chose "Skip this time" → `declined` / `declined_this_candidate`. No review
       record created; ordinary repo policy governs delivery.
-- [ ] Delivery report + commit decision with user (report delivered; commit decision
-      pending — tree mixes staged refactor renames with my edits).
+- [x] Commit decision: user chose "commit everything together, local only, no push" →
+      commit `d0c2581` "feat: improve catalog UX and restructure project layout" on
+      `refactor/ecommerce` (41 files, +1275/-966: refactor renames + all 6 UX changes +
+      `.atl/` + this doc). Working tree clean; nothing pushed to GitHub.
+- [x] Post-commit review assess: `high` risk (hot_path `backend/auth/login.php`),
+      `review_due` → preflight STATUS → consent relayed for candidate
+      sha256:33d4b25d... → user chose "Skip this time" → `declined` /
+      `declined_this_candidate`. No review record; ordinary repo policy governs delivery.
+- [x] Delivery report sent to the user.
