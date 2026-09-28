@@ -36,7 +36,7 @@ CREATE TABLE `orders` (
   `code_prod` int(11) NOT NULL,
   `date_order` datetime NOT NULL,
   `state_order` int(11) NOT NULL,
-  `address_order` varchar(70) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address_order` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone_order` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
   `card_order` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -97,7 +97,13 @@ CREATE TABLE `users` (
   `secondname_user` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `email_user` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `password_user` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
-  `state_user` int(11) NOT NULL
+  `state_user` int(11) NOT NULL,
+  `address_user` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city_user` varchar(60) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `region_user` varchar(60) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip_user` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `country_user` varchar(60) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone_user` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --

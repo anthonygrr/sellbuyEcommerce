@@ -86,6 +86,14 @@ stay as-is), overlay/click zoom, push/PR.
       (port 3999, server killed). NOT verified: DB runtime + real-browser hover
       (MySQL not provisioned).
 - [x] Delegated writer (general, skill frontend-design paths-injected) returned success.
-- [ ] Work-unit commit (local, no push) + delivery report
+- [x] Work-unit commit `5ff93d3` "feat: add product details zoom, quantity stepper,
+      and dev entry route" (6 files, +382/−8, local — no push; `.codegraph/` excluded).
+- [x] Post-commit RDD assess: first attempt `unassessable` (untracked needs declaration)
+      → re-ran with `--untracked-scope=exclude` + inventory → `high` (hot_path
+      `backend/auth/verify_login-buy.php`), `review_due` → preflight (consolidated
+      branch candidate sha256:ef9d13a2..., 66 files/12383 lines) → consent relayed →
+      user chose "Skip this time" → `declined` / `declined_this_candidate`. No review
+      record; ordinary repo policy governs delivery.
+- [x] Delivery report sent to the user.
 - Follow-up noted: `$_SESSION['code_user']` still raw-interpolated in the same SQL
   (out of authorized scope this round).
