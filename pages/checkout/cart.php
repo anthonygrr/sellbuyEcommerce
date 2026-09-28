@@ -133,6 +133,8 @@
           <label class="address_inputs-label" for="type2" title="Credit/Debit Card"> Card  </label> 
      </div>
         <a href="#" class="checkout btn" onclick="process_buy()">Process Buy</a>
+         <button type="button" class="checkout btn" id="payMP" onclick="pay_with_mp()"
+           style="display:inline-block;background-color:#000;color:#fff;padding:0.7rem 1.6rem;font-weight:700;border-radius:3rem;border:none;font-size:1.6rem;cursor:pointer;margin-top:1rem;">Pay with Mercado Pago</button>
         
       </div> 
      
@@ -194,6 +196,40 @@ $(document).ready(function(){
             }
             document.getElementById("tableprods").innerHTML=html;
          },
+        error:function(err){
+            console.error(err);
+        }
+    });
+
+    // Prefill delivery data from the profile, only into fields the user
+    // has not filled in yet (never clobbers what is typed afterwards).
+    $.ajax({
+        url:'/backend/user/get_user_info.php',
+        type:'POST',
+        data:{},
+        success:function(data){
+            if (!data.dates || !data.dates.length) {
+                return;
+            }
+            var profile = data.dates[0];
+            var addressInput = document.getElementById("address_user");
+            var phoneInput = document.getElementById("phone_user");
+
+            if (addressInput && addressInput.value === "") {
+                var addressParts = [];
+                var addressFields = ['address_user','city_user','region_user','zip_user','country_user'];
+                for (var a = 0; a < addressFields.length; a++) {
+                    var part = (profile[addressFields[a]] || "").trim();
+                    if (part !== "") {
+                        addressParts.push(part);
+                    }
+                }
+                addressInput.value = addressParts.join(", ");
+            }
+            if (phoneInput && phoneInput.value === "") {
+                phoneInput.value = (profile.phone_user || "").trim();
+            }
+        },
         error:function(err){
             console.error(err);
         }
@@ -278,6 +314,44 @@ function process_buy() {
 
                 }	
 			}
+}
+
+
+// Mercado Pago Checkout Pro: create a preference server-side and leave
+// the site for the hosted checkout (redirect flow). The manual
+// process_buy() flow above stays untouched.
+function pay_with_mp() {
+  var btn = document.getElementById("payMP");
+  if (btn.disabled) {
+    return;
+  }
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
+
+  $.ajax({
+    url:'/backend/payment/create_preference.php',
+    type:'POST',
+    data:{},
+    success:function(data){
+      if (data.state && data.init_point) {
+        window.location.href = data.init_point;
+        return;
+      }
+      if (data.open_login) {
+        window.location.href = "/pages/auth/signin.php";
+        return;
+      }
+      notifyError(data.detail || "Could not start the payment");
+      btn.disabled = false;
+      btn.style.opacity = "1";
+    },
+    error:function(err){
+      console.error(err);
+      notifyError("Could not start the payment. Please try again");
+      btn.disabled = false;
+      btn.style.opacity = "1";
+    }
+  });
 }
 
 

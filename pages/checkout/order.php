@@ -172,6 +172,19 @@
     <script type="text/javascript">
 
 $(document).ready(function(){
+
+    // Mercado Pago Checkout Pro result toasts (back_urls land on ?mp=...).
+    var mpResult = new URLSearchParams(window.location.search).get('mp');
+    if (mpResult === 'success') {
+        notifySuccess("Payment approved - your order is on its way");
+    } else if (mpResult === 'unverified') {
+        notifyWarning("Payment not verified yet - your order will update shortly");
+    } else if (mpResult === 'pending') {
+        notifyInfo("Payment pending confirmation");
+    } else if (mpResult === 'cancel') {
+        notifyInfo("Payment cancelled");
+    }
+
     $.ajax({
         url:'/backend/order/get_processed.php',
         type:'POST',
@@ -206,7 +219,7 @@ $(document).ready(function(){
         '</tr>'+
         '</table>';
         if (data.datos[i].state_order=="2") {
-          monto+=parseFLoat(data.datos[i].price_prod);
+          monto+=parseFloat(data.datos[i].price_prod);
         }
     
             }

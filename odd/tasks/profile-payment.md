@@ -117,10 +117,25 @@ selects.
 
 ## Progress log
 
-- [ ] T1 migration + script.sql patch (+ live apply if possible)
-- [ ] T2 profile edit (userInfo / get_user_info / modifyProfile)
-- [ ] Commit A: profile + address (local)
-- [ ] T3 checkout scoping + total fix + prefill
-- [ ] T4 MP Checkout Pro (config, create_preference, mp_success, cart button, toasts)
-- [ ] Commit B: checkout + MP (local)
-- [ ] Checks + delivery report
+- [x] T1 migration + script.sql patch (+ live apply if possible) — applied via
+      `docker exec sellbuydb`, post-verified via information_schema (6 new cols,
+      `address_order` 150).
+- [x] T2 profile edit (userInfo / get_user_info / modifyProfile) — `php -l` clean,
+      prepared UPDATE, no password leak, address prefill; parent spot-check passed.
+- [x] Commit A: profile + address (local) — `5cb2b1e` (8 files, +277/−60).
+      Review consent: declined (`declined_this_candidate`).
+- [x] T3 checkout scoping + total fix + prefill — all three WHERE clauses now carry
+      `code_user=?` (confirmed in source); `parseFLoat` → `parseFloat` (order.php:222);
+      cart Address/Phone prefilled from profile (join non-empty parts, only into empty
+      inputs; get_user_info key = `dates`).
+- [x] T4 MP Checkout Pro — config sample + gitignored real config; `create_preference.php`
+      (session gate → config gate → grouped prepared cart query → curl POST → init_point);
+      `mp_success.php` (regex ref validation + ownership + MP `payments/search` re-verify →
+      state 3 + address/phone copy → header-only redirects); cart `#payMP` button
+      (double-click guard, open_login / notifyError handling); order.php `?mp=` toasts.
+      Verified: `php -l` 9/9, `node --check` on extracted inline JS 2/2 (exit 0),
+      CLI harness probes (not_logged, empty-token gate, mp_success 0 stdout bytes ×4),
+      structural pairings (response keys ↔ JS, `?ref=` producer ↔ consumer, back_urls
+      ↔ toasts), live-DB schema + `ONLY_FULL_GROUP_BY` prepared-execute check.
+- [x] Commit B: checkout + MP (local) — this commit; sha recorded in delivery report.
+- [x] Checks + delivery report — pending only the post-commit RDD assess + final report.

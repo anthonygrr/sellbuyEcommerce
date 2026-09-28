@@ -1,4 +1,14 @@
 <?php
+session_start();
+header('Content-Type: application/json');
+
+// Cart feed is per-user: without a logged user return an empty list, no query.
+if (!isset($_SESSION['code_user'])) {
+	echo json_encode((object)array('datos' => array()));
+	exit;
+}
+
+$code_user=(int)$_SESSION['code_user'];
 include __DIR__ . '/../_conection.php';
 $response=new stdClass();
 
@@ -23,8 +33,11 @@ function state2text($id){
 //$datos=array();
 $datos=[];
 $i=0;
-$sql="select *,ord.state_order from orders ord inner join products prods on ord.code_prod=prods.code_prod  where ord.state_order=1";
-$result=mysqli_query($con,$sql);
+$sql="select *,ord.state_order from orders ord inner join products prods on ord.code_prod=prods.code_prod  where ord.state_order=1 and ord.code_user=?";
+$stmt=mysqli_prepare($con,$sql);
+mysqli_stmt_bind_param($stmt,"i",$code_user);
+mysqli_stmt_execute($stmt);
+$result=mysqli_stmt_get_result($stmt);
 while($row=mysqli_fetch_array($result)){
 	$obj=new stdClass();
 	$obj->code_order=$row['code_order'];
