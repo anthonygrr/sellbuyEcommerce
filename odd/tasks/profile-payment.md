@@ -138,4 +138,7 @@ selects.
       structural pairings (response keys ↔ JS, `?ref=` producer ↔ consumer, back_urls
       ↔ toasts), live-DB schema + `ONLY_FULL_GROUP_BY` prepared-execute check.
 - [x] Commit B: checkout + MP (local) — this commit; sha recorded in delivery report.
-- [x] Checks + delivery report — pending only the post-commit RDD assess + final report.
+- [x] Checks + delivery report — DONE. RDD assess not applicable: `gentle-ai review
+      mode status` → off (decided by global). Feature CLOSED with both commits local
+      (5cb2b1e profile/address, e23a28d checkout/MP); working tree clean, secrets
+      (`backend/_payment_config.php`, `.codegraph/`) gitignored and untracked.
