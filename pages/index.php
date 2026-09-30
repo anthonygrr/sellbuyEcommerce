@@ -61,14 +61,15 @@ session_start();
 
 
 <!-- <section class="section promotion"> -->
+<!--
  <div id="visits">
-
+-->
  
- <h2>Visits</h2>
- <?php 
+<!-- <h2>Visits</h2> -->
+<!--
 include __DIR__ . "/../backend/_conection.php";
 date_default_timezone_set("America/Monterrey");
-$ip = $_SERVER['REMOTE_ADDR'];
+$ip = $_SERVER['REMOTE_ADDR']
 
 $sqlConsult = $con->query("SELECT * FROM counter WHERE ip = '$ip' ORDER BY id_count desc");
 $contar = $sqlConsult->num_rows;
@@ -99,6 +100,7 @@ echo $contar;
 
 
 </div>
+-->
 <!-- </section> -->
 
   <section class="section promotion">
@@ -357,7 +359,7 @@ echo $contar;
            
             },
             success:function(data){
-                console.log(data);
+              <!--  console.log(data); -->
 
                 let offers='';
                

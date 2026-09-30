@@ -1180,6 +1180,13 @@ table {
   flex-wrap: wrap;
 }
 
+.cart-info div {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
 .cart-info span {
   color: var(--grey2);
 }
