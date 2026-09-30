@@ -12,6 +12,14 @@ $code_user=(int)$_SESSION['code_user'];
 include __DIR__ . '/../_conection.php';
 $response=new stdClass();
 
+// The connection sets no explicit charset, so bytes may arrive as latin1.
+// Convert only when they are NOT valid UTF-8: utf8_encode() would be
+// deprecated (PHP 8.2) and double-encode an already-UTF-8 string.
+function to_utf8($value){
+	$value=(string)$value;
+	return mb_check_encoding($value,'UTF-8') ? $value
+		: mb_convert_encoding($value,'UTF-8','ISO-8859-1');
+}
 
 function state2text($id){
 		switch ($id) {
@@ -57,15 +65,15 @@ while($row=mysqli_fetch_array($result)){
 	$obj=new stdClass();
 	$obj->code_order=$row['code_order'];
 	$obj->code_prod=$row['code_prod'];
-	$obj->name_prod=utf8_encode($row['name_prod']);
+	$obj->name_prod=to_utf8($row['name_prod']);
 	$obj->image_route=$row['image_route'];
 	$obj->date_order=$row['date_order'];
-	$obj->address_order=utf8_encode($row['address_order']);
-	$obj->phone_order=utf8_encode($row['phone_order']);
+	$obj->address_order=to_utf8($row['address_order']);
+	$obj->phone_order=to_utf8($row['phone_order']);
 	$obj->price_prod=$row['price_prod'];
 	$obj->state_order=$row['state_order'];
 	$obj->state_order_text=state2text($row['state_order']);
-	$obj->card_order=utf8_encode($row['card_order']);
+	$obj->card_order=to_utf8($row['card_order']);
 	$datos[$i]=$obj;
 	$i++;
 }
