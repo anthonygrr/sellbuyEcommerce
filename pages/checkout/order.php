@@ -5,6 +5,29 @@
        header('location: /pages/index.php');
     }
 
+    // Lazy reconciliation of an interrupted Mercado Pago return: the toast
+    // promises "your order will update shortly" — this is what makes it true.
+    // The gate above does not exit, so guard the session user access too.
+    if (!empty($_SESSION['mp_pending_ref']) && !empty($_SESSION['code_user'])) {
+        require_once __DIR__ . '/../../backend/payment/mp_reconcile.php';
+        $pendingRef = (string)$_SESSION['mp_pending_ref'];
+        $pendingUser = (int)$_SESSION['code_user'];
+        if (isset($_GET['mp']) && $_GET['mp'] === 'cancel') {
+            // Explicit cancel: no payment is coming, stop checking.
+            unset($_SESSION['mp_pending_ref']);
+        } elseif (mp_ref_matches_user($pendingRef, $pendingUser)
+            && mp_ref_is_fresh($pendingRef)
+            && mp_reconcile_mark_paid($pendingRef)) {
+            unset($_SESSION['mp_pending_ref']);
+            header('Location: /pages/checkout/order.php?mp=success');
+            exit;
+        } elseif (!mp_ref_is_fresh($pendingRef) || !mp_ref_matches_user($pendingRef, $pendingUser)) {
+            // Stale or foreign ref: drop it, never keep checking.
+            unset($_SESSION['mp_pending_ref']);
+        }
+        // Fresh, matching, but not paid yet: keep the ref, render normally.
+    }
+
     ?>
 
 <!DOCTYPE html>

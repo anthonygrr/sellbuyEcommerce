@@ -5,6 +5,27 @@
        header('location: /pages/index.php');
     }
 
+    // Lazy reconciliation of an interrupted Mercado Pago return: same as
+    // order.php, but cart.php never sees ?mp= params, so there is no cancel
+    // branch here. A paid ref redirects to the orders page where the success
+    // toast lives (the next cart visit is then empty).
+    if (!empty($_SESSION['mp_pending_ref']) && !empty($_SESSION['code_user'])) {
+        require_once __DIR__ . '/../../backend/payment/mp_reconcile.php';
+        $pendingRef = (string)$_SESSION['mp_pending_ref'];
+        $pendingUser = (int)$_SESSION['code_user'];
+        if (mp_ref_matches_user($pendingRef, $pendingUser)
+            && mp_ref_is_fresh($pendingRef)
+            && mp_reconcile_mark_paid($pendingRef)) {
+            unset($_SESSION['mp_pending_ref']);
+            // Send the user where the approval toast lives.
+            header('Location: /pages/checkout/order.php?mp=success');
+            exit;
+        }
+        if (!mp_ref_is_fresh($pendingRef) || !mp_ref_matches_user($pendingRef, $pendingUser)) {
+            unset($_SESSION['mp_pending_ref']);
+        }
+    }
+
     ?>
 
 <!DOCTYPE html>

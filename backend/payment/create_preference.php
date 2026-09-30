@@ -121,6 +121,14 @@ curl_setopt_array($ch, array(
 ));
 $responseBody = curl_exec($ch);
 $curlError = curl_error($ch);
+// Transient network failures only (DNS flake, connect/timeout/SSL hiccup):
+// retry once before giving up. Any other outcome keeps the normal flow.
+$retryableErrno = array(6, 7, 28, 35); // COULDNT_RESOLVE_HOST, COULDNT_CONNECT, TIMEOUT, SSL_CONNECT
+if ($responseBody === false && in_array(curl_errno($ch), $retryableErrno, true)) {
+    usleep(500000);
+    $responseBody = curl_exec($ch);
+    $curlError = curl_error($ch);
+}
 $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
@@ -151,6 +159,10 @@ if ($initPoint === '') {
     echo json_encode(array('state' => false, 'detail' => 'Mercado Pago did not return a payment link'));
     exit;
 }
+
+// Lazy re-check: if the return trip is lost (DNS flake, closed tab), the
+// next visit to order/cart re-verifies this ref and marks the cart paid.
+$_SESSION['mp_pending_ref'] = $external_reference;
 
 echo json_encode(array('state' => true, 'init_point' => $initPoint));
 exit;
