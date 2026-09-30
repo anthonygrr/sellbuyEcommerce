@@ -13,7 +13,7 @@
 ---
 
 ## About the Project
-<img src="docs/homePage.png" alt="SPRING BOOT REST API + DOCKER" >
+<img src="docs/Screenshot_1.png" alt="SELLBUY" >
 
 <b>Sellbuy</b> is an e-commerce platform, developed in PHP, offers the online sale of unisex clothing and accessories. It provides a user-friendly interface, secure purchasing, and efficient product management to deliver a seamless shopping experience.
 
@@ -29,6 +29,7 @@
 - **HTML, CSS and JavaScript**: Handles UI/UX and functionality on the Web Client.
 - **MySQL**: Relational database.
 - **Docker**: Container Management.
+- **Mercado Pago**: Payment Gateway.
 
 
 ---
@@ -73,18 +74,39 @@ Ensure you have the following installed:
 ## Overview
 
 ### Home Page
-<img src="docs/homePage.png">
+<img src="docs/Screenshot_1.png">
+
+<img src="docs/Screenshot_2.png">
+
+### Products 
+<img src="docs/Screenshot_3.png">
+
+### Details 
+<img src="docs/Screenshot_4.png">
+
+### Cart 
+<img src="docs/Screenshot_5.png">
+
+### Payment
+<img src="docs/Screenshot_8.png">
+
+### Ticket
+<img src="docs/Screenshot_9.png">
+
+### Buy History 
+<img src="docs/Screenshot_6.png">
+
+### Profile 
+<img src="docs/Screenshot_7.png">
 
 ### Sign In
-<img src="docs/signIn.png">
+<img src="docs/Screenshot_11.png">
 
-### Products Page
-<img src="docs/products.png">
+### About Us
+<img src="docs/Screenshot_10.png">
 
-### Cart Section
-<img src="docs/cart.png">
 
-### About Section
-<img src="docs/about.png">
+
+
 
 
