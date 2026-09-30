@@ -2204,3 +2204,14 @@ body.dark .zoom-preview {
 .delivery-box h4 a.delivery-edit:hover {
   color: var(--primary);
 }
+
+/* Buy History — the value columns (Quantity/Subtotal/Status) are single-line
+   cells that sit at the cell's vertical middle (td default). The product cell
+   is 150px tall (image), so stretch its text block against the image instead
+   of leaving it stuck to the top: same optical baseline for every column. */
+.bought-table .cart-info {
+  align-items: center;
+}
+.bought-table .cart-info > div {
+  text-align: left;
+}

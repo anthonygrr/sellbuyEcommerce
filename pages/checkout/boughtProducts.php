@@ -33,7 +33,7 @@
     <!-- Bought Products -->
     <div class="container cart" id="cart_prods">
 
-      <table>
+      <table class="bought-table">
         <thead>
           <tr>
             <th>Product</th>
@@ -101,9 +101,9 @@ function loadBoughtProducts() {
                     '<div class="cart-info">'+
                       '<img src="/images/products/'+esc(item.image_route)+'" alt="" />'+
                       '<div>'+
-                        '<strong>'+esc(item.name_prod)+'</strong>'+
+                        '<p><strong>'+esc(item.name_prod)+'</strong></p>'+
                         '<span>Unit price: $'+esc(item.price_prod)+'</span>'+
-                        '<span>Bought: '+esc(item.date)+'</span>'+
+                        '<p>Bought: '+esc(item.date)+'</p>'+
                       '</div>'+
                     '</div>'+
                   '</td>'+
