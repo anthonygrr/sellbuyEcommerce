@@ -63,6 +63,9 @@ Ensure you have the following installed:
    docker compose up -d
    ```
 
+3. Create the `.env` file in the root, place your credentials from Mercado Pago.
+
+
 4. Start the application:
    ```bash
    php -S localhost:3000
