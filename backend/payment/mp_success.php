@@ -32,8 +32,10 @@ if ($accessToken === '') {
 }
 
 // Server-side verification of the payment for this external_reference.
+// A reference can hold several attempts (a rejected one followed by the
+// approved retry), so fetch them all and accept if ANY is paid.
 $searchUrl = 'https://api.mercadopago.com/v1/payments/search?external_reference='
-    . urlencode($ref) . '&limit=1';
+    . urlencode($ref) . '&limit=20';
 $ch = curl_init();
 curl_setopt_array($ch, array(
     CURLOPT_URL            => $searchUrl,
@@ -48,9 +50,16 @@ curl_close($ch);
 $paid = false;
 if ($responseBody !== false && $httpCode >= 200 && $httpCode < 300) {
     $decoded = json_decode($responseBody, true);
-    $status = is_array($decoded) && isset($decoded['results'][0]['status'])
-        ? (string)$decoded['results'][0]['status'] : '';
-    $paid = in_array($status, array('approved', 'authorized'), true);
+    $results = is_array($decoded) && isset($decoded['results']) && is_array($decoded['results'])
+        ? $decoded['results'] : array();
+    foreach ($results as $payment) {
+        $status = is_array($payment) && isset($payment['status'])
+            ? (string)$payment['status'] : '';
+        if (in_array($status, array('approved', 'authorized'), true)) {
+            $paid = true;
+            break;
+        }
+    }
 }
 if (!$paid) {
     // Empty results, rejected/cancelled/in_process, or API failure.
