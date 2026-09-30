@@ -2195,3 +2195,12 @@ body.dark .zoom-preview {
 .delivery-box { border: 1px solid var(--grey2); border-radius: 10px; padding: 1.2rem 1.5rem; margin-top: 1.5rem; }
 .delivery-box h4 { margin: 0 0 .4rem; color: var(--primary); }
 .delivery-box p { margin: 0; color: var(--grey2); }
+
+.delivery-box h4 a.delivery-edit {
+  font-size: 1.3rem;
+  font-weight: normal;
+  color: var(--grey2);
+}
+.delivery-box h4 a.delivery-edit:hover {
+  color: var(--primary);
+}

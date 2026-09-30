@@ -45,7 +45,7 @@
       </table>
 
       <div class="delivery-box">
-        <h4>Delivery address</h4>
+        <h4>Delivery address <a href="/pages/account/userInfo.php" class="delivery-edit">(edit)</a></h4>
         <p id="deliveryText"></p>
       </div>
 
@@ -53,20 +53,6 @@
      
         <table></table>
 
-        <input type="text" placeholder="Address" class="address_inputs" id="address_user">   
-             <input type="text" placeholder="Phone" class="address_inputs" id="phone_user">  
-             <input type="text" placeholder="Credit/Debit Card" class="address_inputs" id="card_user">  
-         <div class="container-type" id="payMethod"> 
-  <h4 class="address_inputs-h4">
-     <a href="/pages/checkout/payMethods.php">Pay Methods</a> </h4>
-
-             <input class="address_inputs-radio" type="radio" name="typeMethod" value="1" id="type1">
-          <label class="address_inputs-label" for="type1">Transference</label> 
-          <br>
-          <input class="address_inputs-radio" type="radio" name="typeMethod" value="2" id="type2">
-          <label class="address_inputs-label" for="type2" title="Credit/Debit Card"> Card  </label> 
-     </div>
-        <a href="#" class="checkout btn" onclick="process_buy()">Process Buy</a>
          <button type="button" class="checkout btn" id="payMP" onclick="pay_with_mp()"
            style="display:inline-block;background-color:#000;color:#fff;padding:0.7rem 1.6rem;font-weight:700;border-radius:3rem;border:none;font-size:1.6rem;cursor:pointer;margin-top:1rem;">Pay with Mercado Pago</button>
         
@@ -212,18 +198,18 @@ $(document).ready(function(){
         remove_from_cart($(this).attr('data-code-prod'));
     });
 
-    // Prefill delivery data from the profile, only into fields the user
-    // has not filled in yet (never clobbers what is typed afterwards).
-    // The same response also feeds the delivery address box.
+    // Fills the delivery address box from the profile (single request;
+    // the profile page is the only place to edit it).
     $.ajax({
         url:'/backend/user/get_user_info.php',
         type:'POST',
         data:{},
         success:function(data){
             var profile = (data.dates && data.dates.length) ? data.dates[0] : null;
-            var addressInput = document.getElementById("address_user");
-            var phoneInput = document.getElementById("phone_user");
             var deliveryEl = document.getElementById("deliveryText");
+            if (!deliveryEl) {
+                return;
+            }
 
             var addressParts = [];
             var addressFields = ['address_user','city_user','region_user','zip_user','country_user'];
@@ -237,26 +223,16 @@ $(document).ready(function(){
                 }
                 phoneText = (profile.phone_user || "").trim();
             }
-            var addressText = addressParts.join(", ");
 
-            if (profile && addressInput && addressInput.value === "") {
-                addressInput.value = addressText;
-            }
-            if (profile && phoneInput && phoneInput.value === "") {
-                phoneInput.value = phoneText;
-            }
-
-            if (deliveryEl) {
-                if (addressParts.length) {
-                    var deliveryText = addressText;
-                    if (phoneText !== "") {
-                        deliveryText += " \u2014 phone: " + phoneText;
-                    }
-                    deliveryEl.textContent = deliveryText;
+            if (addressParts.length) {
+                var deliveryText = addressParts.join(", ");
+                if (phoneText !== "") {
+                    deliveryText += " \u2014 phone: " + phoneText;
                 }
-                else{
-                    deliveryEl.textContent = "No delivery address saved in your profile yet. Fill it below or in your profile.";
-                }
+                deliveryEl.textContent = deliveryText;
+            }
+            else{
+                deliveryEl.textContent = "No delivery address saved in your profile yet. Add it in your profile.";
             }
         },
         error:function(err){
@@ -265,90 +241,8 @@ $(document).ready(function(){
     });
 });
 
-function process_buy() {
-  let address_user=document.getElementById("address_user").value;
-  let phone_user=document.getElementById("phone_user").value;
-  let card_user=document.getElementById("card_user").value;
-  let pay_type=1;
-
-  if (document.getElementById("type2").checked) {
-    pay_type=2;
-  }
-
-			if (phone_user=="" || address_user=="") {
-				notifyWarning("Please fill the address and phone fields");
-			}else{
-        if (!document.getElementById("type1").checked && !document.getElementById("type2").checked) {
-              notifyWarning("Select the pay Method");
-                }
-                else{
-                   if (pay_type==2) {
-                      if (card_user=="") {
-                        notifyWarning("if you want to pay with a credit or debit card you must fill the Card field");
-                      }else{
-                        $.ajax({
-                              url:'/backend/order/confirm.php',
-                              type:'POST',
-                              data:{
-                                address_user:address_user,
-                                phone_user:phone_user,
-                                pay_type:3,
-                                card_user:card_user
-                              
-                                //token:''
-                              },
-                              success:function(data){
-                                console.log(data);
-                                if (data.state) {
-                                  window.location.href="/pages/checkout/order.php";
-                                }else{
-                                  notifyError(data.detail);
-                                }
-                              },
-                              error:function(err){
-                                console.error(err);
-                              }
-                            });
-
-
-                      }
-                   }
-                   else{ //Method 1 - pay by Transference
-                    $.ajax({
-                              url:'/backend/order/confirm.php',
-                              type:'POST',
-                              data:{
-                                address_user:address_user,
-                                phone_user:phone_user,
-                                pay_type:1,
-                                card_user:card_user
-                              
-                                //token:''
-                              },
-                              success:function(data){
-                                console.log(data);
-                                if (data.state) {
-                                  window.location.href="/pages/checkout/order.php";
-                                }else{
-                                  notifyError(data.detail);
-                                }
-                              },
-                              error:function(err){
-                                console.error(err);
-                              }
-                            });
-
-                   }
-                
-
-                }	
-			}
-}
-
-
 // Mercado Pago Checkout Pro: create a preference server-side and leave
-// the site for the hosted checkout (redirect flow). The manual
-// process_buy() flow above stays untouched.
+// the site for the hosted checkout (redirect flow).
 function pay_with_mp() {
   var btn = document.getElementById("payMP");
   if (btn.disabled) {
