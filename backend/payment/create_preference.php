@@ -18,7 +18,7 @@ $accessToken = is_array($config) && isset($config['access_token'])
     ? trim((string)$config['access_token']) : '';
 if ($accessToken === '') {
     echo json_encode(array('state' => false,
-        'detail' => 'Mercado Pago is not configured: paste your access token in backend/_payment_config.php'));
+        'detail' => 'Mercado Pago is not configured: fill MP_ACCESS_TOKEN in the .env file at the project root'));
     exit;
 }
 $currencyId = is_array($config) && isset($config['currency_id']) ? trim((string)$config['currency_id']) : '';
