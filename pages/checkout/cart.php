@@ -33,92 +33,26 @@
     <!-- Cart Items -->
     <div class="container cart" id="cart_prods">
 
-    <table>
-    <tr>
-          <th>Product</th>
-          <!-- <th>Quantity</th> -->
-          <th>Subtotal</th>
-        </tr>
-
-    </table>
-
-<div class="container" id="tableprods">
-  <table> 
-       
-        <!-- <tr>
-          <td>
-            <div class="cart-info">
-              <img src="/images/products/product1.jpg" alt="" />
-              <div>
-                <p>Bambi Print Mini Backpack</p>
-                <span>Price: $500.00</span>
-                <p>Date: 25-10-2021</p>
-                <p>State: 1</p>
-                <p>Address: 8 de Mayo</p>
-                <p>Phone: +527861234567</p>
-           
-                <a href="#">remove</a>
-              </div>
-            </div>
-          </td>
-           <td><input type="number" value="1" min="1" /></td>
-          <td>$50.00</td>
-        </tr>   
- -->
-
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="cartRows"></tbody>
       </table>
-</div>
 
-<!-- 
-      <table > 
-        <tr>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Subtotal</th>
-        </tr>
-
-        <tr>
-          <td>
-            <div class="cart-info">
-              <img src="/images/products/product1.jpg" alt="" />
-              <div>
-                <p>Bambi Print Mini Backpack</p>
-                <span>Price: $500.00</span>
-                <p>Date: 25-10-2021</p>
-                <p>State: 1</p>
-                <p>Address: 8 de Mayo</p>
-                <p>Phone: +527861234567</p>
-           
-                <a href="#">remove</a>
-              </div>
-            </div>
-          </td>
-          <td><input type="number" value="1" min="1" /></td>
-          <td>$50.00</td>
-        </tr>   
-      </table> -->
+      <div class="delivery-box">
+        <h4>Delivery address</h4>
+        <p id="deliveryText"></p>
+      </div>
 
       <div class="total-price">
      
-        <table>
-          <!-- <tr>
-            <td>Subtotal</td>
-            <td>$200</td>
-          </tr>
-          <tr>
-            <td>Tax</td>
-            <td>$50</td>
-          </tr> -->
-         <!--  <tr>
-            <td>Total</td>
-            <td>$250</td>
+        <table></table>
 
-          
-             
-          </tr> -->
-        
-        
-        </table>
         <input type="text" placeholder="Address" class="address_inputs" id="address_user">   
              <input type="text" placeholder="Phone" class="address_inputs" id="phone_user">  
              <input type="text" placeholder="Credit/Debit Card" class="address_inputs" id="card_user">  
@@ -142,11 +76,6 @@
     </div>
 
 
-<!-- 
-    <div class="container cart "> 
-      
-    </div> -->
-
      <!-- Footer -->
      <?php include __DIR__ . "/../../backend/layouts/_footer.php"?>
   <!-- End Footer -->
@@ -161,73 +90,173 @@
 
     <script type="text/javascript">
 
-$(document).ready(function(){
+// Renders the cart: one row per product (quantity, unit price and line
+// subtotal), the cart total and the empty state.
+// Escapes DB-sourced values before they go into innerHTML strings.
+function esc(value) {
+    return String(value).replace(/[&<>"']/g, function (c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
+function loadCart() {
     $.ajax({
         url:'/backend/order/to_process.php',
         type:'POST',
         data:{},
         success:function(data){
-            console.log(data);
+            var items = (data && data.datos) ? data.datos : [];
+            var html='';
+            var totalItems=0;
+            var totalAmount=0;
 
-            let html='';
+            for (var i = 0; i < items.length; i++) {
+                var item=items[i];
+                var price=parseFloat(item.price_prod);
+                if (isNaN(price)) { price=0; }
+                var qty=parseInt(item.qty,10);
+                if (isNaN(qty) || qty<0) { qty=0; }
+                var codeProd=parseInt(item.code_prod,10);
+                if (isNaN(codeProd)) { codeProd=0; }
+                var subtotal=price*qty;
+                totalItems+=qty;
+                totalAmount+=subtotal;
 
-            for (var i = 0; i < data.datos.length; i++) {
                 html+=
-                '<table>'+
-                '<tr>'+              
-          '<td>'+ 
-            '<div class="cart-info">'+ 
-              '<img src="/images/products/'+data.datos[i].image_route+'" alt="" />'+ 
-              '<div>'+ 
-                '<p>'+data.datos[i].name_prod+'</p>'+ 
-                '<span>Price: $'+data.datos[i].price_prod+'</span>'+ 
-                '<p>Date: '+data.datos[i].date_order+'</p>'+ 
-                '<p>State: '+data.datos[i].state_order+'</p>'+ 
-                '<p>Address: '+data.datos[i].address_order+'</p>'+ 
-                '<p>Phone: '+data.datos[i].phone_order+'</p>'+ 
-                '<a href="#">remove</a>'+ 
-              '</div>'+ 
-            '</div>'+ 
-          '</td>'+ 
-          // <td><input type="number" value="1" min="1" /></td>'+ 
-          '<td>$'+data.datos[i].price_prod+'</td>'+ 
-        '</tr>'+
-        '</table>';
+                '<tr>'+
+                  '<td>'+
+                    '<div class="cart-info">'+
+                      '<img src="/images/products/'+esc(item.image_route)+'" alt="" />'+
+                      '<div>'+
+                        '<strong>'+esc(item.name_prod)+'</strong>'+
+                        '<span>Unit price: $'+esc(item.price_prod)+'</span>'+
+                        '<a href="#" class="cart-remove" data-code-prod="'+codeProd+'">Remove</a>'+
+                      '</div>'+
+                    '</div>'+
+                  '</td>'+
+                  '<td class="cart-qty">'+qty+'</td>'+
+                  '<td>$'+subtotal.toFixed(2)+'</td>'+
+                '</tr>';
             }
-            document.getElementById("tableprods").innerHTML=html;
-         },
+
+            if (!items.length) {
+                html='<tr><td colspan="3" class="cart-empty">Your cart is empty</td></tr>';
+            }
+            document.getElementById("cartRows").innerHTML=html;
+
+            $(".total-price table").html(
+                '<tr>'+
+                  '<td>Total ('+totalItems+' items)</td>'+
+                  '<td>$'+totalAmount.toFixed(2)+'</td>'+
+                '</tr>'
+            );
+        },
         error:function(err){
             console.error(err);
         }
     });
+}
+
+// Asks for confirmation first, then hits the removal endpoint.
+function remove_from_cart(codeProd) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            icon:'question',
+            title:'Remove this product?',
+            text:'This product will be removed from your cart.',
+            showCancelButton:true,
+            confirmButtonText:'Remove',
+            cancelButtonText:'Cancel'
+        }).then(function(result){
+            if (result.isConfirmed) {
+                doRemoveFromCart(codeProd);
+            }
+        });
+    }
+    else{
+        if (confirm('Remove this product from your cart?')) {
+            doRemoveFromCart(codeProd);
+        }
+    }
+}
+
+function doRemoveFromCart(codeProd) {
+    $.ajax({
+        url:'/backend/order/remove_from_cart.php',
+        type:'POST',
+        data:{code_prod:codeProd},
+        success:function(data){
+            if (data.state) {
+                notifySuccess(data.detail);
+                loadCart();
+            }
+            else if (data.open_login) {
+                window.location.href="/pages/auth/signin.php";
+            }
+            else{
+                notifyError(data.detail);
+            }
+        },
+        error:function(err){
+            console.error(err);
+        }
+    });
+}
+
+$(document).ready(function(){
+    loadCart();
+
+    // Delegated: rows are re-rendered on every loadCart().
+    $('#cartRows').on('click','a.cart-remove',function(event){
+        event.preventDefault();
+        remove_from_cart($(this).attr('data-code-prod'));
+    });
 
     // Prefill delivery data from the profile, only into fields the user
     // has not filled in yet (never clobbers what is typed afterwards).
+    // The same response also feeds the delivery address box.
     $.ajax({
         url:'/backend/user/get_user_info.php',
         type:'POST',
         data:{},
         success:function(data){
-            if (!data.dates || !data.dates.length) {
-                return;
-            }
-            var profile = data.dates[0];
+            var profile = (data.dates && data.dates.length) ? data.dates[0] : null;
             var addressInput = document.getElementById("address_user");
             var phoneInput = document.getElementById("phone_user");
+            var deliveryEl = document.getElementById("deliveryText");
 
-            if (addressInput && addressInput.value === "") {
-                var addressParts = [];
-                var addressFields = ['address_user','city_user','region_user','zip_user','country_user'];
+            var addressParts = [];
+            var addressFields = ['address_user','city_user','region_user','zip_user','country_user'];
+            var phoneText = "";
+            if (profile) {
                 for (var a = 0; a < addressFields.length; a++) {
                     var part = (profile[addressFields[a]] || "").trim();
                     if (part !== "") {
                         addressParts.push(part);
                     }
                 }
-                addressInput.value = addressParts.join(", ");
+                phoneText = (profile.phone_user || "").trim();
             }
-            if (phoneInput && phoneInput.value === "") {
-                phoneInput.value = (profile.phone_user || "").trim();
+            var addressText = addressParts.join(", ");
+
+            if (profile && addressInput && addressInput.value === "") {
+                addressInput.value = addressText;
+            }
+            if (profile && phoneInput && phoneInput.value === "") {
+                phoneInput.value = phoneText;
+            }
+
+            if (deliveryEl) {
+                if (addressParts.length) {
+                    var deliveryText = addressText;
+                    if (phoneText !== "") {
+                        deliveryText += " \u2014 phone: " + phoneText;
+                    }
+                    deliveryEl.textContent = deliveryText;
+                }
+                else{
+                    deliveryEl.textContent = "No delivery address saved in your profile yet. Fill it below or in your profile.";
+                }
             }
         },
         error:function(err){

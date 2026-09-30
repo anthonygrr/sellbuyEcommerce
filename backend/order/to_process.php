@@ -12,53 +12,42 @@ $code_user=(int)$_SESSION['code_user'];
 include __DIR__ . '/../_conection.php';
 $response=new stdClass();
 
-
-function state2text($id){
-		switch ($id) {
-			case '1':
-				return 'To Process';
-				break;
-
-				case '2':
-					return 'To Pay';
-					break;
-			
-			default:
-				
-				break;
-		}
-
+// The connection sets no explicit charset, so bytes may arrive as latin1.
+// Convert only when they are NOT valid UTF-8: utf8_encode() would be
+// deprecated (PHP 8.2) and double-encode an already-UTF-8 string.
+function to_utf8($value){
+	$value=(string)$value;
+	return mb_check_encoding($value,'UTF-8') ? $value
+		: mb_convert_encoding($value,'UTF-8','ISO-8859-1');
 }
 
-//$datos=array();
+// One row per distinct product: N units of the same product become a
+// single object with its aggregated quantity.
 $datos=[];
-$i=0;
-$sql="select *,ord.state_order from orders ord inner join products prods on ord.code_prod=prods.code_prod  where ord.state_order=1 and ord.code_user=?";
+$sql="SELECT prods.code_prod, prods.name_prod, prods.image_route, prods.price_prod, COUNT(*) AS qty
+FROM orders ord
+INNER JOIN products prods ON ord.code_prod = prods.code_prod
+WHERE ord.state_order = 1 AND ord.code_user = ?
+GROUP BY prods.code_prod, prods.name_prod, prods.image_route, prods.price_prod
+ORDER BY MIN(ord.code_order) ASC";
 $stmt=mysqli_prepare($con,$sql);
 mysqli_stmt_bind_param($stmt,"i",$code_user);
 mysqli_stmt_execute($stmt);
 $result=mysqli_stmt_get_result($stmt);
 while($row=mysqli_fetch_array($result)){
 	$obj=new stdClass();
-	$obj->code_order=$row['code_order'];
 	$obj->code_prod=$row['code_prod'];
-	$obj->name_prod=utf8_encode($row['name_prod']);
+	$obj->name_prod=to_utf8($row['name_prod']);
 	$obj->image_route=$row['image_route'];
-	$obj->date_order=$row['date_order'];
-	$obj->address_order=utf8_encode($row['address_order']);
-	$obj->phone_order=utf8_encode($row['phone_order']);
 	$obj->price_prod=$row['price_prod'];
-	$obj->state_order=state2text($row['state_order']);
-	// $obj->card_user=utf8_encode($row['card_order']);
-	$datos[$i]=$obj;
-	$i++;
+	$obj->qty=(int)$row['qty'];
+	$datos[]=$obj;
 }
 $response->datos=$datos;
 
 mysqli_close($con);
 header('Content-Type: application/json');
 echo json_encode($response);
-
 
 
 
