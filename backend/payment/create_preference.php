@@ -90,8 +90,16 @@ $payload = array(
         'cancel'  => $baseUrl . '/pages/checkout/order.php?mp=cancel',
         'pending' => $baseUrl . '/pages/checkout/order.php?mp=pending',
     ),
-    'auto_return' => 'approved',
 );
+
+// Mercado Pago rejects auto_return together with http:// back_urls
+// ("auto_return invalid. back_url.success must be defined"), and https-only
+// auto-redirecting to a plain-http dev server would fail anyway. Send
+// auto_return only for https bases; on http the MP page shows its own
+// "Return to site" button pointing at the same success URL.
+if (stripos($baseUrl, 'https://') === 0) {
+    $payload['auto_return'] = 'approved';
+}
 
 $jsonBody = json_encode($payload);
 if ($jsonBody === false) {
