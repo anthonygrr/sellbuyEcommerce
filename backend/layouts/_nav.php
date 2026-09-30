@@ -1,7 +1,7 @@
 <nav class="nav">
   <div class="wrapper container">
-    <div class="logo"><a href="index.php">
-      <img src="images/logonegro.png" alt="" srcset="" id="sellbuy"> 
+    <div class="logo"><a href="/pages/index.php">
+      <img src="/images/logonegro.png" alt="" srcset="" id="sellbuy"> 
     </a>
   
     
@@ -11,8 +11,8 @@
         <label for="" class="btn close-btn"><i class="fas fa-times"></i></label>
       
       </div>
-      <li><a href="index.php">Home</a></li>
-      <li><a href="products.php">Products</a></li>
+      <li><a href="/pages/index.php">Home</a></li>
+      <li><a href="/pages/catalog/products.php">Products</a></li>
 
 <!--
       <li>
@@ -25,7 +25,7 @@
          <div class="mega-box">
           <div class="content">
             <div class="row">
-              <img src="./images/woman.jpg" alt="" />
+              <img src="/images/woman.jpg" alt="" />
             </div>
             <div class="row">
               <header>Shop Layout</header>
@@ -77,10 +77,10 @@
         <input type="checkbox" id="showdrop2" />
         <label for="showdrop2" class="mobile-item">Page <span><i class="fas fa-chevron-down"></i></span></label>
         <ul class="drop-menu2">
-          <li><a href="About.php">About</a></li>
-          <li><a href="Contact.php">Contact</a></li>
+          <li><a href="/pages/info/About.php">About</a></li>
+          <li><a href="/pages/info/Contact.php">Contact</a></li>
           <li><a href="">Faq</a></li>
-          <li><a href="404.php">Page 404</a></li>
+          <li><a href="/pages/info/404.php">Page 404</a></li>
          
           
         </ul>
@@ -111,22 +111,22 @@
                     </span>
                 </label>
                     <ul class="drop-menu3">
-                              <li><a href="userInfo.php">My Profile</a></li>
-                          <li><a href="boughtProducts.php">Buy History</a></li>
-                          <li><a href="cart.php">My Cart</a></li>
-                          <li><a href="order.php">My Pendient Orders</a></li>
+                              <li><a href="/pages/account/userInfo.php">My Profile</a></li>
+                          <li><a href="/pages/checkout/boughtProducts.php">Buy History</a></li>
+                          <li><a href="/pages/checkout/cart.php">My Cart</a></li>
+                          <li><a href="/pages/checkout/order.php">My Pendient Orders</a></li>
                           <li><a href="">Faq</a>
-                          </li><li><a href="_logout.php">Log out</a></li>
+                          </li><li><a href="/pages/auth/_logout.php">Log out</a></li>
                     </ul>
              </li>';
 
 
       //  echo'<li><a href="#" ><i class="fas fa-user"> </i> ' .$_SESSION['name_user'].'</a></li>';
-          echo ' <li>  <a href="cart.php" > <i class="fas fa-shopping-cart"></i></a></li>';
+          echo ' <li>  <a href="/pages/checkout/cart.php" > <i class="fas fa-shopping-cart"></i></a></li>';
       }else{
         ?>
         <li>
-                <a href="signin.php" class="desktop-item"> 
+                <a href="/pages/auth/signin.php" class="desktop-item"> 
                     <i class="fas fa-user"></i> 
                     <span>
                     <i class="fas fa-chevron-down"></i>
@@ -139,11 +139,11 @@
                     </span>
                 </label>
                     <ul class="drop-menu3">
-                          <li><a href="signin.php">SignIn</a></li>
-                          <li><a href="signup.php">SignUp</a></li>
+                          <li><a href="/pages/auth/signin.php">SignIn</a></li>
+                          <li><a href="/pages/auth/signup.php">SignUp</a></li>
                     </ul>
              </li>
-        <!-- <li>  <a href="signin.php" > <i class="fas fa-user"> </i></a></li> -->
+        <!-- <li>  <a href="/pages/auth/signin.php" > <i class="fas fa-user"> </i></a></li> -->
       
 
         <?php
@@ -166,29 +166,49 @@
       <!-- icons -->
       <!-- <li class="icons">
         <span>
-          <img src="./images/shoppingBag.svg" alt="" />
+          <img src="/images/shoppingBag.svg" alt="" />
           <small class="count d-flex">0</small>
         </span>
       <span> <a href="#"> <i class="fas fa-user"></i></a></span>
       </li> -->
     
     </ul>
-    <input type="text" class="search_text" placeholder="Search" id="searchID" value="<?php
-     if (isset($_GET['text'])) {
-      echo $_GET['text'];
-     }
-     else{
-       echo '';
-     }
-   
-     
-     ?>">
-    <a href="#"> <i class="fas fa-search search_icon" id="search_icon" onclick="searchProduct()"></i></a>
+    <div class="search-box">
+      <input type="text" class="search_text" placeholder="Search products" id="searchID" value="<?php echo isset($_GET['text']) && is_string($_GET['text']) ? htmlspecialchars($_GET['text'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+      <a href="#" class="search-btn" onclick="searchProduct(); return false;" aria-label="Search"><i class="fas fa-search search_icon"></i></a>
+    </div>
     <label for="" class="btn open-btn"><i class="fas fa-bars"></i></label>
     
   </div>
  
-
-
+ 
+ 
 </div>
 </nav>
+<script>
+/* Apply saved theme before first paint */
+(function () {
+  var savedTheme = null;
+  try {
+    savedTheme = localStorage.getItem('sellbuy-theme');
+  } catch (e) {
+    savedTheme = null;
+  }
+
+  if (savedTheme !== 'dark') {
+    return; /* 'light' or absent: default markup is already light */
+  }
+
+  document.body.classList.add('dark');
+
+  var switchBtn = document.getElementById('switch');
+  if (switchBtn) {
+    switchBtn.classList.add('active');
+  }
+
+  var logo = document.getElementById('sellbuy');
+  if (logo && logo.src.indexOf('logonegro.png') !== -1) {
+    logo.src = '/images/logoblanco.png';
+  }
+})();
+</script>

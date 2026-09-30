@@ -12,13 +12,13 @@
         <div class="footer-center">
           <h3>INFORMATION</h3>
 
-          <a href="./About.php">About Us</a>
-          <a href="./howToBuy.php">How To Buy</a>
-          <a href="./payMethods.php">Pay Method</a>
-          <a href="./Privacy.php">Privacy Policy</a>
-          <a href="./TermsandConditions.php">Terms & Conditions</a>
+          <a href="/pages/info/About.php">About Us</a>
+          <a href="/pages/info/howToBuy.php">How To Buy</a>
+          <a href="/pages/checkout/payMethods.php">Pay Method</a>
+          <a href="/pages/info/Privacy.php">Privacy Policy</a>
+          <a href="/pages/info/TermsandConditions.php">Terms & Conditions</a>
           
-          <a href="./Contact.php">Contact Us</a>
+          <a href="/pages/info/Contact.php">Contact Us</a>
          
         </div>
         <div class="footer-center">
@@ -50,10 +50,13 @@
             456-456-4512
           </div>
           <div class="payment-methods">
-            <img src="./images/payment.png" alt="">
+            <img src="/images/payment.png" alt="">
           </div>
         </div>
       </div>
     </div>
     </div>
   </footer>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/notifications.js"></script>
